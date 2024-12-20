@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Plus Jakarta Sans', Helvetica, sans-serif;
+}
+
+@layer components {
+  .heading-1 {
+    font-size: clamp(calc(1.75rem), calc(6vw + 1px), 62px);
+  }
+
+  .heading-2 {
+    font-size: clamp(calc(1.75rem), calc(6vw + 1px), 4rem);
+  }
+
+  /* .text-regular {
+    font-size: clamp(calc(.5rem), calc(1vw + 1px), 1rem);
+  } */
+
+  /* .text-sm-1 {
+    font-size: clamp(0.25rem, calc(2.5vw + 1px), 1rem);
+  } */
+
+  .outter-padding {
+    padding: clamp(0.75rem, 1vw + 0.01px, 2rem);
+  }
+
+  .input-padding {
+    padding: clamp(0.5rem, 1vw + 0.01px, 2rem);
+  }
+
+  .inner-padding {
+    padding: clamp(0.25rem, 0.5vw + 0.01px, 1.5rem);
+  }
+
+  .center {
+    @apply flex justify-center items-center;
+  }
+
+  .rounded-corner {
+    @apply rounded-xl;
+  }
+
+  .node {
+    @apply w-fit text-sm relative left-[.75rem] lg:left-[1rem] overflow-hidden;
+  }
+
+  .title {
+    @apply flex px-1 py-2 bg-gray-4;
+  }
+}
