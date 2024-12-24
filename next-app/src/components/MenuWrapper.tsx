@@ -16,7 +16,6 @@ export default function MenuWrapper({ node }: { node: Node }) {
   const rootNode = useAppSelector((state) => state.menu.menuTree)
   const addForm = useAppSelector((state) => state.form.addForm)
   const dispatch = useAppDispatch()
-  console.log(rootNode)
 
   useEffect(() => {
     dispatch(setMenuTree(node))

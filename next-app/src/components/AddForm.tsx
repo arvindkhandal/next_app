@@ -61,7 +61,6 @@ export default function AddForm({ node }: { node: Node | undefined }) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values)
       await dispatch(
         addMenuAsync({
           name: values.name,

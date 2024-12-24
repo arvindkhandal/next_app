@@ -14,7 +14,6 @@ export default function FormWrapper() {
   const node = useAppSelector((state) => state.form.node)
 
   useEffect(() => {
-    console.log(menuTree)
     dispatch(setAddForm(false))
     dispatch(setUpdateForm(false))
   }, [menuTree])

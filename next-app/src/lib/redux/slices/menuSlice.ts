@@ -22,7 +22,6 @@ export const addMenuAsync = createAsyncThunk(
       depth,
       parentId,
     }
-    console.log('menuData', menuData)
     const res = await fetch('http://localhost:3000/api/menu', {
       method: 'POST',
       body: JSON.stringify(menuData),
