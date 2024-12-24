@@ -7,18 +7,15 @@ export const addMenuAsync = createAsyncThunk(
   'addMenu/status',
   async ({
     name,
-    type,
     depth,
     parentId,
   }: {
     name: string
-    type: 'folder' | 'file'
     depth: number
     parentId: number | undefined
   }) => {
     const menuData = {
       name,
-      type,
       depth,
       parentId,
     }
@@ -83,7 +80,6 @@ const menuSlice = createSlice({
       .addCase(addMenuAsync.fulfilled, (state, action: PayloadAction<Node>) => {
         state.menuTree = action.payload
       })
-
       //  Update menu
       .addCase(
         updateMenuAsync.fulfilled,

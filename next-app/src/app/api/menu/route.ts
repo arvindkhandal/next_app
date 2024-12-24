@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server'
 import db from '@/db'
 
-type NodeType = 'folder' | 'file'
-
 interface MenuNode {
   id: number
   name: string
-  type: NodeType
   depth: number
   parentId: number | null
   children: MenuNode[]
@@ -16,8 +13,7 @@ interface MenuNode {
 export async function GET() {
   try {
     const result = await fetchMenuTree()
-
-    if (!result.rootNode) {
+    if (!result) {
       return NextResponse.json(
         { message: 'Root node not found' },
         { status: 404 }
@@ -25,7 +21,6 @@ export async function GET() {
     }
     return NextResponse.json(result)
   } catch (error) {
-    console.error(error)
     return NextResponse.json(
       { error: 'An error occurred while fetching the menu tree.' },
       { status: 500 }
@@ -38,19 +33,15 @@ export async function POST(req: Request) {
   try {
     const {
       name,
-      type,
       depth,
       parentId,
     }: {
       name: string
-      type: 'folder' | 'file'
       depth: number
       parentId: number | undefined
     } = await req.json()
 
-    console.log(name, type, depth, parentId)
-
-    if (!name || !type || typeof depth !== 'number') {
+    if (!name || typeof depth !== 'number') {
       return NextResponse.json(
         {
           message: 'missing fields',
@@ -62,7 +53,6 @@ export async function POST(req: Request) {
     const newNode = await db.menuNode.create({
       data: {
         name,
-        type,
         depth,
         parentId: parentId || null,
       },
@@ -78,34 +68,23 @@ export async function POST(req: Request) {
   }
 }
 
-export async function fetchMenuTree(): Promise<{ rootNode: MenuNode | null }> {
-  const rootNode = await db.menuNode.findFirst({
-    where: { depth: 0, parentId: null },
+export async function fetchMenuTree() {
+  const allNodes = await db.menuNode.findMany()
+  const nodeMap = new Map<number, MenuNode>()
+  let rootNode: MenuNode | null = null
+
+  allNodes.forEach((node) => {
+    nodeMap.set(node.id, { ...node, children: [] })
   })
 
-  if (!rootNode) return { rootNode: null }
-
-  return {
-    rootNode: await getNestedMenuNode(rootNode.id),
-  }
-}
-
-async function getNestedMenuNode(nodeId: number): Promise<MenuNode | null> {
-  const node = await db.menuNode.findUnique({
-    where: { id: nodeId },
-    include: { children: true },
+  allNodes.forEach((node) => {
+    if (node.parentId) {
+      const parent = nodeMap.get(node.parentId)
+      parent?.children?.push(nodeMap.get(node.id)!)
+    } else {
+      rootNode = nodeMap.get(node.id)!
+    }
   })
 
-  if (!node) return null
-
-  return {
-    id: node.id,
-    name: node.name,
-    type: node.type as NodeType,
-    depth: node.depth,
-    parentId: node.parentId,
-    children: (await Promise.all(
-      node.children.map(async (child) => await getNestedMenuNode(child.id))
-    )) as MenuNode[],
-  }
+  return { rootNode }
 }

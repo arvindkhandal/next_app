@@ -20,11 +20,6 @@ import { addMenuAsync } from '@/lib/redux/slices/menuSlice'
 import { useEffect } from 'react'
 
 const formSchema = z.object({
-  type: z.enum(['folder', 'file'], {
-    errorMap: () => ({
-      message: "Type must be either 'folder' or 'file'.",
-    }),
-  }),
   parentName: z.string(),
   depth: z.string(),
   name: z.string().min(1, { message: 'Name must be present.' }),
@@ -37,7 +32,6 @@ export default function AddForm({ node }: { node: Node | undefined }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       depth: node?.depth?.toString() || '0',
-      type: 'folder',
       parentName: node?.name || 'Root Node',
       name: '',
     },
@@ -54,7 +48,6 @@ export default function AddForm({ node }: { node: Node | undefined }) {
         depth: node.depth?.toString() || '0',
         parentName: node?.name,
         name: '',
-        type: 'folder',
       })
     }
   }, [node, reset])
@@ -64,7 +57,6 @@ export default function AddForm({ node }: { node: Node | undefined }) {
       await dispatch(
         addMenuAsync({
           name: values.name,
-          type: values.type || 'folder',
           depth: menuTree
             ? parseInt(values.depth, 10) + 1
             : parseInt(values.depth, 10),
@@ -82,24 +74,6 @@ export default function AddForm({ node }: { node: Node | undefined }) {
         onSubmit={form.handleSubmit(onSubmit)}
         className='text-xs flex flex-col gap-3 w-full'
       >
-        <FormField
-          control={form.control}
-          name='type'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type</FormLabel>
-              <FormControl>
-                <Input
-                  disabled={!menuTree}
-                  className={!menuTree ? 'opacity-50' : ''}
-                  placeholder='folder or file'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name='parentName'

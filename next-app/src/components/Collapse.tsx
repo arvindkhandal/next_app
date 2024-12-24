@@ -13,13 +13,17 @@ export default function Collapse() {
 
   if (!menuTree) return
 
+  function closeAllForm() {
+    dispatch(setUpdateForm(false))
+    dispatch(setAddForm(false))
+  }
+
   return (
     <div className='flex gap-4 text-xs'>
       <Button
         onClick={() => {
           dispatch(setShowAllMenu(true))
-          dispatch(setUpdateForm(false))
-          dispatch(setAddForm(false))
+          closeAllForm()
         }}
         className={`${
           showAllMenu
@@ -32,8 +36,7 @@ export default function Collapse() {
       <Button
         onClick={() => {
           dispatch(setShowAllMenu(false))
-          dispatch(setUpdateForm(false))
-          dispatch(setAddForm(false))
+          closeAllForm()
         }}
         className={`${
           !showAllMenu

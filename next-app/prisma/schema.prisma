@@ -10,14 +10,8 @@ datasource db {
 model MenuNode {
   id       Int        @id @default(autoincrement())
   name     String
-  type     NodeType
   depth    Int
   parentId Int?
   parent   MenuNode?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
   children MenuNode[] @relation("ParentChild")
-}
-
-enum NodeType {
-  folder
-  file
 }

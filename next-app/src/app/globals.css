@@ -22,14 +22,6 @@ body {
     font-size: clamp(calc(1.75rem), calc(6vw + 1px), 4rem);
   }
 
-  /* .text-regular {
-    font-size: clamp(calc(.5rem), calc(1vw + 1px), 1rem);
-  } */
-
-  /* .text-sm-1 {
-    font-size: clamp(0.25rem, calc(2.5vw + 1px), 1rem);
-  } */
-
   .outter-padding {
     padding: clamp(0.75rem, 1vw + 0.01px, 2rem);
   }
