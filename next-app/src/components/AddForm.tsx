@@ -15,24 +15,31 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Node } from '@/types'
-import { useAppDispatch } from '@/lib/redux/hooks'
-import { updateMenuAsync } from '@/lib/redux/slices/menuSlice'
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks'
+import { addMenuAsync } from '@/lib/redux/slices/menuSlice'
 import { useEffect } from 'react'
 
 const formSchema = z.object({
-  menuId: z.string(),
+  type: z.enum(['folder', 'file'], {
+    errorMap: () => ({
+      message: "Type must be either 'folder' or 'file'.",
+    }),
+  }),
+  parentName: z.string(),
   depth: z.string(),
   name: z.string().min(1, { message: 'Name must be present.' }),
 })
 
-export default function EditForm({ node }: { node: Node | undefined }) {
+export default function AddForm({ node }: { node: Node | undefined }) {
   const dispatch = useAppDispatch()
+  const menuTree = useAppSelector((state) => state.menu.menuTree)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      menuId: node?.id?.toString() || 'ID',
       depth: node?.depth?.toString() || '0',
-      name: node?.name || 'Name',
+      type: 'folder',
+      parentName: node?.name || 'Root Node',
+      name: '',
     },
   })
 
@@ -44,16 +51,27 @@ export default function EditForm({ node }: { node: Node | undefined }) {
   useEffect(() => {
     if (node) {
       reset({
-        menuId: node.id?.toString() || 'ID',
         depth: node.depth?.toString() || '0',
-        name: node?.name || 'Name',
+        parentName: node?.name,
+        name: '',
+        type: 'folder',
       })
     }
   }, [node, reset])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await dispatch(updateMenuAsync({ id: values.menuId, name: values.name }))
+      console.log(values)
+      await dispatch(
+        addMenuAsync({
+          name: values.name,
+          type: values.type || 'folder',
+          depth: menuTree
+            ? parseInt(values.depth, 10) + 1
+            : parseInt(values.depth, 10),
+          parentId: node?.id ? node?.id : undefined,
+        })
+      )
     } catch (error) {
       console.error('Error submitting form:', error)
     }
@@ -67,10 +85,28 @@ export default function EditForm({ node }: { node: Node | undefined }) {
       >
         <FormField
           control={form.control}
-          name='menuId'
+          name='type'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Menu ID</FormLabel>
+              <FormLabel>Type</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={!menuTree}
+                  className={!menuTree ? 'opacity-50' : ''}
+                  placeholder='folder or file'
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='parentName'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Parent Name</FormLabel>
               <FormControl>
                 <Input
                   className={'opacity-50'}
@@ -107,7 +143,10 @@ export default function EditForm({ node }: { node: Node | undefined }) {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  placeholder='Name'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -118,7 +157,7 @@ export default function EditForm({ node }: { node: Node | undefined }) {
           type='submit'
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Loading' : 'Update'}
+          {isSubmitting ? 'Loading' : 'Add'}
         </Button>
       </form>
     </Form>

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import db from '@/db'
+import { fetchMenuTree } from '../route'
 
 // Update and pass name in search query
 export async function PUT(
@@ -22,12 +23,10 @@ export async function PUT(
       where: { id: parseInt(id, 10) },
       data: { name },
     })
-    return NextResponse.json(
-      {
-        updatedNode,
-      },
-      { status: 200 }
-    )
+    if (updatedNode) {
+      const result = await fetchMenuTree()
+      return NextResponse.json(result)
+    }
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error }, { status: 500 })
@@ -46,7 +45,8 @@ export async function DELETE(
       where: { id: parseInt(id, 10) },
     })
 
-    return NextResponse.json({ message: 'Node deleted' }, { status: 200 })
+    const result = await fetchMenuTree()
+    return NextResponse.json(result)
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error }, { status: 500 })
