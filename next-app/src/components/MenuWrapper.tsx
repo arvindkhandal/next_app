@@ -5,16 +5,11 @@ import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks'
 import { setMenuTree } from '@/lib/redux/slices/menuSlice'
 import MenuTree from './MenuTree'
 import addIcon from '../../public/add-icon.svg'
-import {
-  setAddForm,
-  setNode,
-  setUpdateForm,
-} from '@/lib/redux/slices/formSlice'
+import { setAddForm } from '@/lib/redux/slices/formSlice'
 import Image from 'next/image'
 
 export default function MenuWrapper({ node }: { node: Node }) {
   const rootNode = useAppSelector((state) => state.menu.menuTree)
-  const addForm = useAppSelector((state) => state.form.addForm)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
